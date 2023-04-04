@@ -5042,6 +5042,22 @@ RValue CodeGenFunction::EmitBuiltinExpr(const GlobalDecl GD, unsigned BuiltinID,
         Builder.CreateIntrinsic(llvm::Intrinsic::cheri_cap_load_tags, {SizeTy},
                                 {EmitScalarExpr(E->getArg(0))}));
 
+  // Experimental builtins for CHERI
+  case Builtin::BI__builtin_cheri_cap_addr_and:
+    return RValue::get(Builder.CreateIntrinsic(
+        llvm::Intrinsic::cheri_cap_addr_and, {SizeTy},
+        {EmitCastToVoidPtr(EmitScalarExpr(E->getArg(0))),
+         EmitScalarExpr(E->getArg(1))}));
+  case Builtin::BI__builtin_cheri_cap_user_data_perms_and:
+    return RValue::get(Builder.CreateIntrinsic(
+        llvm::Intrinsic::cheri_cap_user_data_perms_and, {SizeTy},
+        {EmitCastToVoidPtr(EmitScalarExpr(E->getArg(0)))}));
+  case Builtin::BI__builtin_cheri_cap_dereferenceable_test:
+    return RValue::get(Builder.CreateIntrinsic(
+        llvm::Intrinsic::cheri_cap_dereferenceable_test, {SizeTy},
+        {EmitCastToVoidPtr(EmitScalarExpr(E->getArg(0)))}));
+
+
   case Builtin::BI__fastfail:
     return RValue::get(EmitMSVCBuiltinExpr(MSVCIntrin::__fastfail, E));
 

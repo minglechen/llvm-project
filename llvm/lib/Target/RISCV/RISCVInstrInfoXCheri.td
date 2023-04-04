@@ -359,6 +359,11 @@ def : InstAlias<"cincoffsetimm $cd, $cs1, $imm",
                 (CIncOffsetImm GPCR:$cd, GPCR:$cs1, simm12:$imm), 0>;
 def : InstAlias<"csetboundsimm $cd, $cs1, $imm",
                 (CSetBoundsImm GPCR:$cd, GPCR:$cs1, uimm12:$imm), 0>;
+
+// Experimental instructions
+def CAndAddr       : Cheri_rr<0x22, "candaddr">;
+def CAndPermUserdata : Cheri_r<0x15, "candpermuserdata", GPCR>;
+def CTestDereferenceable : Cheri_r<0x13, "ctestdereferenceable", GPCR>;
 }
 
 //===----------------------------------------------------------------------===//
@@ -1187,6 +1192,12 @@ def : PatGpcrGpcr<int_cheri_cap_build, CBuildCap>;
 def : PatGpcrGpcr<int_cheri_cap_type_copy, CCopyType>;
 def : PatGpcrGpcr<int_cheri_cap_conditional_seal, CCSeal>;
 def : PatGpcr<int_cheri_cap_seal_entry, CSealEntry>;
+
+/// Experimental instructions
+
+def : PatGpcrGpr<int_cheri_cap_address_and, CAndAddr>;
+def : PatGpcr<int_cheri_cap_user_data_perms_and, CAndPermUserData>;
+def : PatGpcr<int_cheri_cap_dereferennceable_test, CTestDereferenceable>;
 
 // TODO: Make this rematerialisable like MIPS
 def : PatGpcrGpr<int_cheri_bounded_stack_cap, CSetBounds>;

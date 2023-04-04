@@ -117,8 +117,8 @@ def int_cheri_cap_address_and:
 def int_cheri_cap_user_data_perms_and:
   Intrinsic<[llvm_fatptr_ty], [llvm_fatptr_ty], [IntrNoMem, IntrWillReturn]>;
 
-def int_cheri_cap_dereferennceable_test:
-  Intrinsic<[llvm_i1_ty], [llvm_fatptr_ty], [IntrNoMem, IntrWillReturn]>;
+def int_cheri_cap_dereferenceable_test:
+  Intrinsic<[llvm_anyint_ty], [llvm_fatptr_ty], [IntrNoMem, IntrWillReturn]>;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Offset-related intrinsics

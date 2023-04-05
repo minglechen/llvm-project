@@ -1662,9 +1662,9 @@ BUILTIN(__builtin_cheri_cap_type_copy, "v*mvC*mvC*m", "nct")
 BUILTIN(__builtin_cheri_conditional_seal, "v*mvC*mvC*m", "nct")
 
 // Experimental builtins
-BUILTIN(__builtin_cheri_cap_addr_and, "v*mvC*mz", "nct")
-BUILTIN(__builtin_cheri_cap_user_data_perms_and, "v*mvC*m", "nct")
-BUILTIN(__builtin_cheri_cap_dereferenceable_test, "bvC*m", "nct")
+BUILTIN(__builtin_cheri_address_and, "v*mvC*mz", "nct")
+BUILTIN(__builtin_cheri_user_data_perms_and, "v*mvC*m", "nct")
+BUILTIN(__builtin_cheri_dereferenceable_test, "zvC*m", "nct")
 
 // Safestack builtins
 BUILTIN(__builtin___get_unsafe_stack_start, "v*", "Fn")

@@ -316,6 +316,8 @@ def CGetSealed : Cheri_r<0x5, "cgetsealed">;
 def CGetOffset : Cheri_r<0x6, "cgetoffset">;
 def CGetFlags  : Cheri_r<0x7, "cgetflags">;
 def CGetAddr   : Cheri_r<0xf, "cgetaddr">;
+// Experimental instruction
+def CTestDereferenceable : Cheri_r<0x13, "ctestdereferenceable">;
 }
 
 //===----------------------------------------------------------------------===//
@@ -363,7 +365,6 @@ def : InstAlias<"csetboundsimm $cd, $cs1, $imm",
 // Experimental instructions
 def CAndAddr       : Cheri_rr<0x22, "candaddr">;
 def CAndPermUserData : Cheri_r<0x15, "candpermuserdata", GPCR>;
-def CTestDereferenceable : Cheri_r<0x13, "ctestdereferenceable", GPCR>;
 }
 
 //===----------------------------------------------------------------------===//

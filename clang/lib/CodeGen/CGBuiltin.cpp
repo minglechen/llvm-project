@@ -5043,16 +5043,32 @@ RValue CodeGenFunction::EmitBuiltinExpr(const GlobalDecl GD, unsigned BuiltinID,
                                 {EmitScalarExpr(E->getArg(0))}));
 
   // Experimental builtins for CHERI
-  case Builtin::BI__builtin_cheri_address_and:
+  case Builtin::BI__builtin_cheri_address_and: {
+    Value *Cap = EmitScalarExpr(E->getArg(0));
+    Value *Addr = EmitScalarExpr(E->getArg(1));
+    // The bitcast causes the following assertion to fail in llvm::StoreInst::AssertOK, otherwise it seems to work fine:
+    //  Assertion `cast<PointerType>(getOperand(1)->getType()) ->isOpaqueOrPointeeTypeMatches(getOperand(0)->getType()) && "Ptr must be a pointer to Val type!"' failed.
+    // return RValue::get(Builder.CreateBitCast(
+    //     Builder.CreateIntrinsic(llvm::Intrinsic::cheri_cap_address_and, {SizeTy},
+    //                             {EmitCastToVoidPtr(Cap), Addr}),
+    //     Cap->getType()));
     return RValue::get(Builder.CreateIntrinsic(
         llvm::Intrinsic::cheri_cap_address_and, {SizeTy},
-        {EmitCastToVoidPtr(EmitScalarExpr(E->getArg(0))),
-         EmitScalarExpr(E->getArg(1))}));
-  case Builtin::BI__builtin_cheri_user_data_perms_and:
-    return RValue::get(Builder.CreateIntrinsic(
-        llvm::Intrinsic::cheri_cap_user_data_perms_and, {SizeTy},
-        {EmitCastToVoidPtr(EmitScalarExpr(E->getArg(0)))}));
+        {EmitCastToVoidPtr(Cap), Addr}));
+  }
+  case Builtin::BI__builtin_cheri_user_data_perms_and: {
+    Value *Cap = EmitScalarExpr(E->getArg(0));
+    // For some reason the intrinsic is not overloaded and the following assertion fails when creating the intrinsic:
+    // std::string getIntrinsicNameImpl(Intrinsic::ID, ArrayRef<llvm::Type *>, llvm::Module *, llvm::FunctionType *, bool): Assertion `(Tys.empty() || Intrinsic::isOverloaded(Id)) && "This version of getName is for overloaded intrinsics only"' failed.
+
+    return RValue::get(Builder.CreateBitCast(
+        Builder.CreateIntrinsic(llvm::Intrinsic::cheri_cap_user_data_perms_and,
+                                {SizeTy},
+                                {EmitCastToVoidPtr(Cap)}),
+        Cap->getType()));
+  }
   case Builtin::BI__builtin_cheri_dereferenceable_test:
+  // This one seems to work without issues
     return RValue::get(Builder.CreateIntrinsic(
         llvm::Intrinsic::cheri_cap_dereferenceable_test, {SizeTy},
         {EmitCastToVoidPtr(EmitScalarExpr(E->getArg(0)))}));

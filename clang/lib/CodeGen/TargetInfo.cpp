@@ -822,6 +822,7 @@ class CommonCheriTargetCodeGenInfo : public TargetCodeGenInfo {
   mutable llvm::Function *GetOffset = nullptr;
   mutable llvm::Function *SetOffset = nullptr;
   mutable llvm::Function *SetAddr = nullptr;
+  mutable llvm::Function *AndAddr = nullptr;
   mutable llvm::Function *GetBase = nullptr;
   mutable llvm::Function *GetAddress = nullptr;
   mutable llvm::Function *SetBounds = nullptr;
@@ -872,6 +873,28 @@ public:
     assert(Addr->getType()->getIntegerBitWidth() ==
            CGF.CGM.getDataLayout().getIndexTypeSizeInBits(DstTy));
     llvm::Value *Result = B.CreateCall(SetAddr, {Ptr, Addr}, Name);
+    if (CGF.SanOpts.has(SanitizerKind::CheriUnrepresentable))
+      Result = CGF.EmitCapabilityArithmeticCheck(Ptr, Result, Loc);
+    return B.CreateBitCast(Result, DstTy);
+  }
+
+  llvm::Value *andPointerAddress(CodeGen::CodeGenFunction &CGF,
+                                 llvm::Value *Ptr, llvm::Value *Addr,
+                                 const llvm::Twine &Name,
+                                 SourceLocation Loc) const override {
+    if (isa<llvm::ConstantPointerNull>(Ptr)) {
+      // Avoid unnecessary work for instcombine by returning a null-derived cap:
+      return CGF.getNullDerivedCapability(Ptr->getType(), Addr);
+    }
+    if (!AndAddr)
+      AndAddr = CGF.CGM.getIntrinsic(llvm::Intrinsic::cheri_cap_address_and,
+                                     CGF.IntPtrTy);
+    llvm::Type *DstTy = Ptr->getType();
+    auto &B = CGF.Builder;
+    Ptr = B.CreateBitCast(Ptr, getI8CapTy(CGF));
+    assert(Addr->getType()->getIntegerBitWidth() ==
+           CGF.CGM.getDataLayout().getIndexTypeSizeInBits(DstTy));
+    llvm::Value *Result = B.CreateCall(AndAddr, {Ptr, Addr}, Name);
     if (CGF.SanOpts.has(SanitizerKind::CheriUnrepresentable))
       Result = CGF.EmitCapabilityArithmeticCheck(Ptr, Result, Loc);
     return B.CreateBitCast(Result, DstTy);

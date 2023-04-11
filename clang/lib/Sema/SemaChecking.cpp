@@ -2203,6 +2203,8 @@ Sema::CheckBuiltinFunctionCall(FunctionDecl *FDecl, unsigned BuiltinID,
     TheCall->setType(SrcTy);
     break;
   }
+  /* Experimental address and */
+  case Builtin::BI__builtin_cheri_address_and:
   case Builtin::BI__builtin_cheri_offset_set:
   case Builtin::BI__builtin_cheri_address_set:
   case Builtin::BI__builtin_cheri_offset_increment: {
@@ -2268,6 +2270,8 @@ Sema::CheckBuiltinFunctionCall(FunctionDecl *FDecl, unsigned BuiltinID,
         Context.getPointerType(Context.VoidTy, PIK_Capability));
     break;
   }
+  // Experimental user data perms and
+  case Builtin::BI__builtin_cheri_user_data_perms_and:
   case Builtin::BI__builtin_cheri_tag_clear:
   case Builtin::BI__builtin_cheri_seal_entry: {
     // Tag-clear and seal-entry behave like the mutator functions but don't have
@@ -2289,6 +2293,8 @@ Sema::CheckBuiltinFunctionCall(FunctionDecl *FDecl, unsigned BuiltinID,
       return ExprError();
     break;
   }
+  // Experimental test dereferenceable
+  case Builtin::BI__builtin_cheri_dereferenceable_test:
   case Builtin::BI__builtin_cheri_address_get:
   case Builtin::BI__builtin_cheri_base_get:
   case Builtin::BI__builtin_cheri_flags_get:
